@@ -289,3 +289,21 @@ body {
     vertical-align: middle;
     letter-spacing: 1px;
 }
+
+/* 古风空状态占位 */
+.chart-empty {
+    width: 100%;
+    height: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #b8a88a;
+    font-family: "STKaiti", "KaiTi", serif;
+    letter-spacing: 3px;
+    border: 1px dashed rgba(201, 169, 110, 0.4);
+    background: rgba(245, 240, 232, 0.5);
+}
+.chart-empty .icon { font-size: 40px; margin-bottom: 15px; opacity: 0.6; }
+.chart-empty .text { font-size: 15px; }
+.chart-empty .sub { font-size: 12px; margin-top: 8px; color: #c9b896; letter-spacing: 1px; }
