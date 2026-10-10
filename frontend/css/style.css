@@ -1,0 +1,291 @@
+/* ===== 千年诗境 · 掐丝珐琅古典风 ===== */
+/* 配色：佛头青 #19325F / 朱樱 #77171C / 描金 #C9A96E / 莲子白 #E5D3AA / 凝脂 #F1EEE5 */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --ink-blue: #19325F;      /* 佛头青 */
+    --crimson: #77171C;       /* 朱樱 */
+    --gold: #C9A96E;          /* 描金 */
+    --gold-light: #E5D3AA;    /* 莲子白 */
+    --paper: #F1EEE5;         /* 凝脂 */
+    --paper-dark: #E8DFD0;
+    --pine: #3D6036;          /* 松绿 */
+    --vermilion: #A33F32;     /* 朱草 */
+}
+
+body {
+    font-family: "Microsoft YaHei", "PingFang SC", "STSong", "宋体", serif;
+    color: #2a2a2a;
+    min-height: 100vh;
+    /* 淡色云纹背景，用SVG内联pattern实现 */
+    background-color: var(--paper);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23C9A96E' stroke-width='0.5' opacity='0.15'%3E%3Cpath d='M20,60 Q20,40 40,40 Q50,40 50,50 Q50,30 70,30 Q90,30 90,50 Q100,50 100,65 Q100,80 85,80 L35,80 Q20,80 20,60 Z'/%3E%3Ccircle cx='60' cy='60' r='3'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ===== 顶部导航：深蓝底 + 金边 ===== */
+.nav {
+    background: linear-gradient(90deg, var(--ink-blue) 0%, #2a4470 50%, var(--ink-blue) 100%);
+    padding: 0 50px;
+    display: flex;
+    align-items: center;
+    height: 64px;
+    box-shadow: 0 2px 12px rgba(25, 50, 95, 0.3);
+    border-bottom: 2px solid var(--gold);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.nav .logo {
+    color: var(--gold);
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 5px;
+    margin-right: 60px;
+    text-decoration: none;
+    font-family: "STKaiti", "KaiTi", serif;
+}
+.nav a {
+    color: var(--gold-light);
+    text-decoration: none;
+    padding: 0 22px;
+    line-height: 64px;
+    font-size: 15px;
+    transition: all 0.25s;
+    position: relative;
+}
+.nav a:hover {
+    color: #fff;
+    background: rgba(201, 169, 110, 0.15);
+}
+.nav a.active {
+    color: #fff;
+    background: rgba(201, 169, 110, 0.2);
+}
+.nav a.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 2px;
+    background: var(--gold);
+}
+
+/* ===== 页面容器 ===== */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 30px;
+}
+
+/* ===== 页头：带装饰线 ===== */
+.page-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 20px 0;
+}
+.page-header h1 {
+    font-size: 30px;
+    color: var(--ink-blue);
+    letter-spacing: 6px;
+    font-family: "STKaiti", "KaiTi", serif;
+    display: inline-block;
+    padding: 0 40px;
+    position: relative;
+}
+.page-header h1::before,
+.page-header h1::after {
+    content: '❖';
+    color: var(--gold);
+    font-size: 20px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.page-header h1::before { left: 0; }
+.page-header h1::after { right: 0; }
+.page-header p {
+    color: #8b7355;
+    margin-top: 12px;
+    font-size: 14px;
+    letter-spacing: 2px;
+}
+
+/* ===== 卡片：米白底 + 金边 + 古风角花 ===== */
+.card {
+    background: rgba(255, 253, 247, 0.9);
+    border-radius: 4px;
+    padding: 24px;
+    box-shadow: 0 2px 16px rgba(25, 50, 95, 0.1);
+    margin-bottom: 24px;
+    border: 1px solid rgba(201, 169, 110, 0.4);
+    position: relative;
+}
+/* 四角花纹装饰 */
+.card::before,
+.card::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--gold);
+}
+.card::before {
+    top: -2px; left: -2px;
+    border-right: none; border-bottom: none;
+}
+.card::after {
+    bottom: -2px; right: -2px;
+    border-left: none; border-top: none;
+}
+.card h3 {
+    color: var(--ink-blue);
+    font-size: 17px;
+    margin-bottom: 18px;
+    padding-left: 12px;
+    border-left: 3px solid var(--crimson);
+    font-family: "STKaiti", "KaiTi", serif;
+    letter-spacing: 2px;
+}
+
+/* ===== 网格 ===== */
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+.grid-2 .card { margin-bottom: 0; }
+@media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+}
+
+.chart {
+    width: 100%;
+    height: 360px;
+}
+
+/* ===== 首页 hero ===== */
+.hero {
+    text-align: center;
+    padding: 100px 20px 60px;
+    position: relative;
+}
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 30px; left: 50%;
+    transform: translateX(-50%);
+    width: 200px; height: 200px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='%23C9A96E' stroke-width='0.8' opacity='0.3'%3E%3Ccircle cx='50' cy='50' r='40'/%3E%3Ccircle cx='50' cy='50' r='30'/%3E%3Cpath d='M50,15 Q60,30 50,50 Q40,30 50,15 Z'/%3E%3Cpath d='M50,85 Q60,70 50,50 Q40,70 50,85 Z'/%3E%3Cpath d='M15,50 Q30,40 50,50 Q30,60 15,50 Z'/%3E%3Cpath d='M85,50 Q70,40 50,50 Q70,60 85,50 Z'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
+    opacity: 0.5;
+    pointer-events: none;
+}
+.hero h1 {
+    font-size: 64px;
+    color: var(--ink-blue);
+    letter-spacing: 12px;
+    margin-bottom: 20px;
+    font-family: "STKaiti", "KaiTi", serif;
+    text-shadow: 2px 2px 0 rgba(201, 169, 110, 0.3);
+    position: relative;
+}
+.hero .sub {
+    font-size: 18px;
+    color: #8b7355;
+    margin-bottom: 50px;
+    letter-spacing: 4px;
+}
+.hero .actions { position: relative; }
+.hero .actions a {
+    display: inline-block;
+    padding: 14px 40px;
+    background: linear-gradient(135deg, var(--crimson), #993030);
+    color: #fff;
+    text-decoration: none;
+    border: 1px solid var(--gold);
+    margin: 0 12px;
+    letter-spacing: 3px;
+    font-size: 15px;
+    transition: all 0.25s;
+    position: relative;
+}
+.hero .actions a:hover {
+    background: linear-gradient(135deg, #993030, var(--crimson));
+    box-shadow: 0 4px 16px rgba(119, 23, 28, 0.4);
+    transform: translateY(-2px);
+}
+.hero .actions a.secondary {
+    background: transparent;
+    color: var(--ink-blue);
+    border: 1px solid var(--ink-blue);
+}
+.hero .actions a.secondary:hover {
+    background: var(--ink-blue);
+    color: #fff;
+}
+
+/* ===== 首页功能入口 ===== */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    max-width: 1200px;
+    margin: 40px auto 0;
+}
+@media (max-width: 900px) {
+    .feature-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.feature-item {
+    background: rgba(255, 253, 247, 0.9);
+    border-radius: 4px;
+    padding: 36px 20px;
+    text-align: center;
+    text-decoration: none;
+    color: #2a2a2a;
+    border: 1px solid rgba(201, 169, 110, 0.4);
+    box-shadow: 0 2px 12px rgba(25, 50, 95, 0.08);
+    transition: all 0.25s;
+    position: relative;
+}
+.feature-item::before {
+    content: '';
+    position: absolute;
+    top: 8px; left: 8px; right: 8px; bottom: 8px;
+    border: 1px solid rgba(201, 169, 110, 0.3);
+    pointer-events: none;
+}
+.feature-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 24px rgba(25, 50, 95, 0.15);
+    border-color: var(--gold);
+}
+.feature-item .icon {
+    font-size: 44px;
+    margin-bottom: 16px;
+}
+.feature-item h4 {
+    color: var(--ink-blue);
+    margin-bottom: 10px;
+    font-size: 17px;
+    font-family: "STKaiti", "KaiTi", serif;
+    letter-spacing: 2px;
+}
+.feature-item p {
+    font-size: 13px;
+    color: #8b7355;
+    line-height: 1.6;
+}
+
+.badge {
+    display: inline-block;
+    background: var(--gold);
+    color: #fff;
+    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 2px;
+    margin-left: 8px;
+    vertical-align: middle;
+    letter-spacing: 1px;
+}

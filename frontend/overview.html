@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>千年诗境 · 诗词数据概览</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="overview">
+    <nav class="nav">
+        <a href="index.html" class="logo">千年诗境</a>
+        <a href="dynasty.html" data-page="dynasty">朝代分析</a>
+        <a href="poet.html" data-page="poet">诗人图谱</a>
+        <a href="text.html" data-page="text">诗词文本分析</a>
+        <a href="imagery.html" data-page="imagery">诗境意象</a>
+        <a href="overview.html" data-page="overview">诗词数据概览</a>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>诗词数据概览</h1>
+            <p>诗词类型/结构分析 <span class="badge">模拟数据预览</span></p>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h3>各诗词类别数量（饼图）</h3>
+                <div id="categoryPie" class="chart"></div>
+            </div>
+            <div class="card">
+                <h3>诗词类别 TopN（横向条形图）</h3>
+                <div id="categoryTop" class="chart"></div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:20px;">
+            <h3>朝代 × 类别 分布（堆叠柱状图）</h3>
+            <div id="dynastyCategory" class="chart" style="height:400px;"></div>
+        </div>
+
+        <div class="card">
+            <h3>诗词长度区间分布（柱状图）</h3>
+            <div id="lengthRange" class="chart"></div>
+        </div>
+    </div>
+
+<script src="js/common.js"></script>
+<script>
+// ============ 4 个 Job 的数据，等后端接口好了换成 fetchAPI() ============
+
+// Job1: 各类别数量
+const categoryCount = {
+    "古体诗": 52341, "近体诗": 38920, "词": 8200,
+    "绝句": 6500, "律诗": 4200, "乐府": 1800, "其他": 1500
+};
+
+// Job2: 类别 TopN
+const categoryTopN = Object.entries(categoryCount)
+    .sort((a, b) => b[1] - a[1]).slice(0, 6);
+
+// Job3: 朝代 × 类别
+const dynasties = ["唐代", "宋代", "元代", "明代", "清代", "魏晋", "先秦"];
+const categories = ["古体诗", "近体诗", "词", "绝句", "律诗"];
+const dynastyCategoryData = {
+    "古体诗": [18200, 9800, 2100, 7600, 8900, 3200, 541],
+    "近体诗": [15600, 11200, 980, 4300, 5800, 800, 20],
+    "词":     [1200,  6800,  400,  100,  300,  50,  50],
+    "绝句":   [3200,  2100,  300,  400,  450,   50,   0],
+    "律诗":   [2800,  1500,  120,  300,  500,   30,   0]
+};
+
+// Job4: 长度区间
+const lengthRangeData = {
+    "0-20": 12000, "21-50": 45000, "51-100": 32000, "101-200": 15000, "200+": 5643
+};
+
+// ============ 画图（用全局 THEME_COLORS 保证风格统一） ============
+
+echarts.init(document.getElementById('categoryPie')).setOption({
+    tooltip: { trigger: 'item', formatter: '{b}: {c} 首 ({d}%)' },
+    legend: { bottom: 0, type: 'scroll' },
+    color: THEME_COLORS,
+    series: [{
+        type: 'pie', radius: ['40%', '70%'],
+        label: { show: true, formatter: '{b}\n{d}%' },
+        data: Object.entries(categoryCount).map(([name, value]) => ({ name, value }))
+    }]
+});
+
+echarts.init(document.getElementById('categoryTop')).setOption({
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    grid: { left: 80, right: 40, top: 10, bottom: 30 },
+    xAxis: { type: 'value' },
+    yAxis: { type: 'category', data: categoryTopN.map(x => x[0]).reverse() },
+    series: [{
+        type: 'bar', data: categoryTopN.map(x => x[1]).reverse(),
+        itemStyle: { color: '#c9a96e', borderRadius: [0, 4, 4, 0] },
+        label: { show: true, position: 'right' }
+    }]
+});
+
+echarts.init(document.getElementById('dynastyCategory')).setOption({
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    legend: { data: categories, top: 0 },
+    grid: { left: 60, right: 30, top: 40, bottom: 30 },
+    xAxis: { type: 'category', data: dynasties },
+    yAxis: { type: 'value', name: '数量' },
+    color: THEME_COLORS,
+    series: categories.map(cat => ({
+        name: cat, type: 'bar', stack: 'total', data: dynastyCategoryData[cat]
+    }))
+});
+
+echarts.init(document.getElementById('lengthRange')).setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: 60, right: 30, top: 20, bottom: 30 },
+    xAxis: { type: 'category', data: Object.keys(lengthRangeData), name: '字数区间' },
+    yAxis: { type: 'value', name: '诗词数量' },
+    color: THEME_COLORS,
+    series: [{
+        type: 'bar', data: Object.values(lengthRangeData),
+        itemStyle: { color: '#19325F', borderRadius: [4, 4, 0, 0] },
+        label: { show: true, position: 'top' }
+    }]
+});
+
+window.addEventListener('resize', () => {
+    document.querySelectorAll('.chart').forEach(el => echarts.getInstanceByDom(el)?.resize());
+});
+</script>
+</body>
+</html>

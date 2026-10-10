@@ -1,0 +1,14 @@
+# IDE
+.idea/
+*.iml
+
+# 编译产物
+target/
+
+# 临时文件
+.ref/
+*.tmp
+.DS_Store
+
+# 日志
+*.log
