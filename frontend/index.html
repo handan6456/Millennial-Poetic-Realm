@@ -6,6 +6,15 @@
     <title>千年诗境 · 首页</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
+        /* 背景图层（承载水墨背景图，可切换） */
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: url('img/bg-home.jpg') center/cover no-repeat fixed;
+            transition: opacity 0.6s ease;
+        }
+
         /* 背景轮播诗句 */
         .bg-poem {
             position: fixed;
@@ -17,29 +26,61 @@
             align-items: center;
             justify-content: center;
             pointer-events: none;
-            z-index: 0;
+            z-index: 1;
         }
         .bg-poem .line {
             font-size: clamp(40px, 8vw, 90px);
-            color: var(--ink-blue);
-            opacity: 0.12;
+            color: #fff;
+            opacity: 0.75;
             font-family: "STKaiti", "KaiTi", "华文楷体", serif;
             letter-spacing: 12px;
             text-align: center;
             line-height: 1.6;
             transition: opacity 1s ease;
             padding: 0 40px;
+            text-shadow: 2px 2px 8px rgba(25, 50, 95, 0.5);
         }
         .bg-poem .author {
             font-size: clamp(16px, 2vw, 24px);
-            color: var(--ink-blue);
-            opacity: 0.12;
+            color: #fff;
+            opacity: 0.75;
             font-family: "STKaiti", "KaiTi", serif;
             letter-spacing: 4px;
             margin-top: 30px;
             transition: opacity 1s ease;
+            text-shadow: 2px 2px 6px rgba(25, 50, 95, 0.5);
         }
         .bg-poem.fade .line, .bg-poem.fade .author { opacity: 0; }
+
+        /* 换景按钮 */
+        .bg-switch {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 300;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: rgba(255, 253, 247, 0.85);
+            border: 2px solid var(--gold);
+            color: var(--ink-blue);
+            font-size: 13px;
+            font-family: "STKaiti", "KaiTi", serif;
+            letter-spacing: 1px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            box-shadow: 0 3px 12px rgba(25, 50, 95, 0.2);
+            transition: all 0.25s;
+        }
+        .bg-switch .icon { font-size: 18px; margin-bottom: 1px; }
+        .bg-switch:hover {
+            background: var(--ink-blue);
+            color: #fff;
+            transform: rotate(20deg);
+        }
 
         /* 主内容 */
         .main-content {
@@ -118,11 +159,20 @@
         <a href="overview.html" data-page="overview">诗词数据概览</a>
     </nav>
 
+    <!-- 背景图层 -->
+    <div class="bg-layer" id="bgLayer"></div>
+
     <!-- 背景轮播诗句 -->
     <div class="bg-poem" id="bgPoem">
         <div class="line" id="poemLine">床前明月光，疑是地上霜。</div>
         <div class="author" id="poemAuthor">—— 李白《静夜思》</div>
     </div>
+
+    <!-- 换景按钮 -->
+    <button class="bg-switch" id="bgSwitch" onclick="switchBg()" title="更换背景">
+        <span class="icon">🏞</span>
+        <span>换景</span>
+    </button>
 
     <!-- 主内容 -->
     <div class="main-content">
@@ -192,6 +242,19 @@
 
         // 4秒自动换
         setInterval(showNextPoem, 4000);
+
+        // ===== 换景功能：三张背景循环切换 =====
+        const bgImages = ['img/bg-home.jpg', 'img/bg-2.jpg', 'img/bg-3.jpg'];
+        const bgLayer = document.getElementById('bgLayer');
+        let bgIdx = 0;
+        function switchBg() {
+            bgLayer.style.opacity = 0;
+            setTimeout(() => {
+                bgIdx = (bgIdx + 1) % bgImages.length;
+                bgLayer.style.backgroundImage = `url('${bgImages[bgIdx]}')`;
+                bgLayer.style.opacity = 1;
+            }, 600);
+        }
     </script>
 </body>
 </html>

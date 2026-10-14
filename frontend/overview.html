@@ -44,6 +44,64 @@
         @media (max-width: 900px) {
             .stats-row { grid-template-columns: repeat(2, 1fr); }
         }
+
+        /* 朝代联动详情卡片 */
+        .detail-panel {
+            background: rgba(255, 253, 247, 0.92);
+            border: 1px solid rgba(201, 169, 110, 0.4);
+            padding: 20px 24px;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 24px;
+            position: relative;
+        }
+        .detail-panel::before, .detail-panel::after {
+            content: '';
+            position: absolute;
+            width: 12px; height: 12px;
+            border: 2px solid var(--gold);
+        }
+        .detail-panel::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+        .detail-panel::after { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+        .detail-left h4 {
+            color: var(--ink-blue);
+            font-size: 20px;
+            font-family: "STKaiti", "KaiTi", serif;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+        .detail-left .total {
+            font-size: 14px;
+            color: #8b7355;
+            margin-bottom: 20px;
+        }
+        .detail-left .verse {
+            font-size: 18px;
+            color: var(--crimson);
+            font-family: "STKaiti", "KaiTi", serif;
+            letter-spacing: 2px;
+            line-height: 1.8;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(201, 169, 110, 0.5);
+        }
+        .detail-left .verse .src {
+            font-size: 13px;
+            color: #8b7355;
+            display: block;
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+        .detail-right h5 {
+            color: #5a3e2b;
+            font-size: 13px;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        #detailChart { width: 100%; height: 150px; }
+        @media (max-width: 700px) {
+            .detail-panel { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body data-page="overview">
@@ -94,8 +152,24 @@
         </div>
 
         <div class="card" style="margin-top:20px;">
-            <h3>朝代 × 类别 分布（可点击图例筛选）</h3>
+            <h3>朝代 × 类别 分布（点击柱段，下方联动查看朝代详情）</h3>
             <div id="dynastyCategory" class="chart" style="height:400px;"></div>
+
+            <!-- 联动详情卡片 -->
+            <div class="detail-panel">
+                <div class="detail-left">
+                    <h4 id="detailDynasty">唐代</h4>
+                    <div class="total" id="detailTotal">—</div>
+                    <div class="verse">
+                        <span id="detailVerse">海上生明月，天涯共此时。</span>
+                        <span class="src" id="detailVerseSrc">—— 张九龄《望月怀远》</span>
+                    </div>
+                </div>
+                <div class="detail-right">
+                    <h5>该朝代各类别数量</h5>
+                    <div id="detailChart"></div>
+                </div>
+            </div>
         </div>
 
         <div class="card">
@@ -166,8 +240,9 @@ echarts.init(document.getElementById('categoryTop')).setOption({
     }]
 });
 
-// ============ 3. 堆叠图（legend可筛选） ============
-echarts.init(document.getElementById('dynastyCategory')).setOption({
+// ============ 3. 堆叠图（legend可筛选 + 点击联动） ============
+const dynastyChart = echarts.init(document.getElementById('dynastyCategory'));
+dynastyChart.setOption({
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
     legend: { data: categories, top: 0, selectedMode: 'multiple' },
     grid: { left: 60, right: 30, top: 40, bottom: 30 },
@@ -177,6 +252,49 @@ echarts.init(document.getElementById('dynastyCategory')).setOption({
     series: categories.map(cat => ({
         name: cat, type: 'bar', stack: 'total', data: dynastyCategoryData[cat]
     }))
+});
+
+// 各朝代代表诗句（模拟，接后端后可换成接口数据）
+const dynastyPoem = {
+    "唐代": { verse: "海上生明月，天涯共此时。", src: "张九龄《望月怀远》" },
+    "宋代": { verse: "山重水复疑无路，柳暗花明又一村。", src: "陆游《游山西村》" },
+    "元代": { verse: "枯藤老树昏鸦，小桥流水人家。", src: "马致远《天净沙·秋思》" },
+    "明代": { verse: "千锤万凿出深山，烈火焚烧若等闲。", src: "于谦《石灰吟》" },
+    "清代": { verse: "九州生气恃风雷，万马齐喑究可哀。", src: "龚自珍《己亥杂诗》" },
+    "魏晋": { verse: "采菊东篱下，悠然见南山。", src: "陶渊明《饮酒》" },
+    "先秦": { verse: "关关雎鸠，在河之洲。", src: "《诗经·关雎》" }
+};
+
+// 详情小条形图
+const detailChart = echarts.init(document.getElementById('detailChart'));
+function updateDetail(dynastyIdx) {
+    const name = dynasties[dynastyIdx];
+    const values = categories.map(cat => dynastyCategoryData[cat][dynastyIdx]);
+    const total = values.reduce((a, b) => a + b, 0);
+    document.getElementById('detailDynasty').textContent = name;
+    document.getElementById('detailTotal').textContent = `共计 ${total.toLocaleString()} 首诗词`;
+    const p = dynastyPoem[name] || {};
+    document.getElementById('detailVerse').textContent = p.verse || '（暂无诗句）';
+    document.getElementById('detailVerseSrc').textContent = p.src ? '—— ' + p.src : '';
+    detailChart.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        grid: { left: 40, right: 20, top: 10, bottom: 10 },
+        xAxis: { type: 'category', data: categories },
+        yAxis: { type: 'value', show: false },
+        color: THEME_COLORS,
+        series: [{
+            type: 'bar', data: values,
+            barWidth: '45%',
+            itemStyle: { borderRadius: [3, 3, 0, 0] },
+            label: { show: true, position: 'top', fontSize: 10 }
+        }]
+    }, true);
+}
+// 初始显示第一个朝代（唐代）
+updateDetail(0);
+// 点击堆叠图任意一段 -> 联动更新详情
+dynastyChart.on('click', function(params) {
+    updateDetail(params.dataIndex);
 });
 
 // ============ 4. 长度区间（加平均线） ============
