@@ -104,6 +104,29 @@ const I18N = {
         'im.c2': '意象 TopN',
         'im.c3': '朝代 × 意象',
         'im.c4': '作者 × 意象',
+        /* 登录门禁 */
+        'auth.gateTitle': '千 年 诗 境',
+        'auth.gateSub': '请登录后进入首页',
+        'auth.title': '登 录',
+        'auth.titleReg': '注 册',
+        'auth.user': '用户名',
+        'auth.pass': '密码',
+        'auth.pass2': '确认密码',
+        'auth.submit': '登 录',
+        'auth.submitReg': '注 册',
+        'auth.toReg': '没有账号？去注册',
+        'auth.toLogin': '已有账号？去登录',
+        'auth.errFill': '请输入用户名和密码',
+        'auth.errLen': '密码至少 8 位',
+        'auth.errType': '密码需含两种字符（字母/数字/符号）',
+        'auth.pwdHint': '至少 8 位，需含两种字符（字母/数字/符号）',
+        'auth.errMatch': '两次密码不一致',
+        'auth.errExists': '用户名已存在',
+        'auth.errWrong': '用户名或密码错误',
+        'auth.hint': '模拟账号：admin / 123456',
+        'auth.welcome': '登录成功',
+        'auth.welcomeBack': '欢迎回来',
+        'auth.enter': '进入首页',
     },
     en: {
         'logo': 'Millennial Poetry',
@@ -184,6 +207,29 @@ const I18N = {
         'im.c2': 'Imagery TopN',
         'im.c3': 'Dynasty × Imagery',
         'im.c4': 'Poet × Imagery',
+        /* 登录门禁 */
+        'auth.gateTitle': 'MILLENNIAL POETRY',
+        'auth.gateSub': 'Please sign in to enter',
+        'auth.title': 'Sign In',
+        'auth.titleReg': 'Register',
+        'auth.user': 'Username',
+        'auth.pass': 'Password',
+        'auth.pass2': 'Confirm password',
+        'auth.submit': 'Sign In',
+        'auth.submitReg': 'Register',
+        'auth.toReg': 'No account? Register',
+        'auth.toLogin': 'Have account? Sign in',
+        'auth.errFill': 'Enter username and password',
+        'auth.errLen': 'Password must be at least 8 characters',
+        'auth.errType': 'Password must contain two types (letters / digits / symbols)',
+        'auth.pwdHint': 'At least 8 chars with two types (letters/digits/symbols)',
+        'auth.errMatch': 'Passwords do not match',
+        'auth.errExists': 'Username already exists',
+        'auth.errWrong': 'Invalid username or password',
+        'auth.hint': 'Demo account: admin / 123456',
+        'auth.welcome': 'Signed in',
+        'auth.welcomeBack': 'Welcome back',
+        'auth.enter': 'Enter',
     }
 };
 
@@ -198,6 +244,10 @@ function applyLang(lang) {
         const key = el.dataset.i18nTitle;
         if (dict[key] != null) el.title = dict[key];
     });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.dataset.i18nPlaceholder;
+        if (dict[key] != null) el.placeholder = dict[key];
+    });
     const btn = document.getElementById('langSwitch');
     if (btn) btn.textContent = dict['langBtn'];
     document.documentElement.lang = (lang === 'zh') ? 'zh-CN' : 'en';
@@ -210,6 +260,18 @@ function applyLang(lang) {
 function t(key) {
     const dict = I18N[window.__lang || 'zh'];
     return (dict && dict[key] != null) ? dict[key] : key;
+}
+
+// 密码强度校验：至少 8 位，且含两种字符（小写/大写/数字/符号）
+function pwdError(p) {
+    if (!p || p.length < 8) return t('auth.errLen');
+    let types = 0;
+    if (/[a-z]/.test(p)) types++;
+    if (/[A-Z]/.test(p)) types++;
+    if (/[0-9]/.test(p)) types++;
+    if (/[^a-zA-Z0-9]/.test(p)) types++;
+    if (types < 2) return t('auth.errType');
+    return '';
 }
 
 function toggleLang() {
@@ -239,3 +301,148 @@ document.addEventListener('DOMContentLoaded', () => {
     // 应用已保存的语言
     applyLang(localStorage.getItem('poetry_lang') || 'zh');
 });
+
+// ===== 登录/注册模块（当前为前端模拟，后端接口就位后替换验证逻辑） =====
+function initAuth() {
+    // 预置模拟账号
+    if (!localStorage.getItem('poetry_users')) {
+        localStorage.setItem('poetry_users', JSON.stringify([{ u: 'admin', p: '123456' }]));
+    }
+
+    // 注入导航右侧用户区
+    const nav = document.querySelector('.nav');
+    if (nav && !document.getElementById('authBox')) {
+        const box = document.createElement('div');
+        box.id = 'authBox';
+        box.className = 'auth-box';
+        nav.appendChild(box);
+    }
+
+    // 注入登录/注册模态框
+    if (!document.getElementById('authMask')) {
+        const mask = document.createElement('div');
+        mask.id = 'authMask';
+        mask.className = 'auth-mask';
+        mask.innerHTML = `
+            <div class="auth-modal">
+                <button class="auth-close" id="authClose">×</button>
+                <div class="auth-title" id="authTitle">❖ 登 录 ❖</div>
+                <input class="auth-field" id="authUser" placeholder="用户名" autocomplete="off">
+                <div class="pwd-wrap">
+                    <input class="auth-field" id="authPass" type="password" placeholder="密码">
+                    <button class="pwd-eye" id="authEye" type="button" aria-label="显示密码">👁</button>
+                </div>
+                <div class="pwd-hint" id="authPwdHint" style="display:none">至少 8 位，需含两种字符（字母/数字/符号）</div>
+                <input class="auth-field" id="authPass2" type="password" placeholder="确认密码" style="display:none">
+                <div class="auth-err" id="authErr"></div>
+                <button class="auth-submit" id="authSubmit">登 录</button>
+                <div class="auth-switch" id="authSwitch">没有账号？去注册</div>
+                <div class="auth-hint">模拟账号：<b>admin</b> / <b>123456</b></div>
+            </div>`;
+        document.body.appendChild(mask);
+
+        let mode = 'login';
+        const title = document.getElementById('authTitle');
+        const pass2 = document.getElementById('authPass2');
+        const submit = document.getElementById('authSubmit');
+        const sw = document.getElementById('authSwitch');
+        const err = document.getElementById('authErr');
+
+        document.getElementById('authClose').onclick = closeAuth;
+        mask.onclick = e => { if (e.target === mask) closeAuth(); };
+
+        function switchMode(m) {
+            mode = m;
+            title.innerHTML = m === 'login' ? '❖ 登 录 ❖' : '❖ 注 册 ❖';
+            submit.textContent = m === 'login' ? '登 录' : '注 册';
+            sw.innerHTML = m === 'login' ? '没有账号？去注册' : '已有账号？去登录';
+            pass2.style.display = m === 'login' ? 'none' : 'block';
+            document.getElementById('authPwdHint').style.display = m === 'login' ? 'none' : 'block';
+            err.textContent = '';
+        }
+        // 密码防偷窥（仅切换明文/密文，图标不变）
+        document.getElementById('authEye').onclick = () => {
+            const p = document.getElementById('authPass');
+            p.type = p.type === 'password' ? 'text' : 'password';
+        };
+        sw.onclick = () => switchMode(mode === 'login' ? 'register' : 'login');
+
+        submit.onclick = () => {
+            const u = document.getElementById('authUser').value.trim();
+            const p = document.getElementById('authPass').value;
+            const p2 = document.getElementById('authPass2').value;
+            err.textContent = '';
+            if (!u || !p) { err.textContent = '请输入用户名和密码'; return; }
+            const users = JSON.parse(localStorage.getItem('poetry_users') || '[]');
+            if (mode === 'register') {
+                const pe = pwdError(p);
+                if (pe) { err.textContent = pe; return; }
+                if (p !== p2) { err.textContent = '两次密码不一致'; return; }
+                if (users.some(x => x.u === u)) { err.textContent = '用户名已存在'; return; }
+                users.push({ u, p });
+                localStorage.setItem('poetry_users', JSON.stringify(users));
+            } else {
+                const user = users.find(x => x.u === u && x.p === p);
+                if (!user) { err.textContent = '用户名或密码错误'; return; }
+            }
+            localStorage.setItem('poetry_user', u);
+            closeAuth();
+            renderAuth();
+        };
+    }
+
+    // 打开登录
+    window.openAuth = function () {
+        document.getElementById('authMask').style.display = 'flex';
+        document.getElementById('authUser').focus();
+    };
+
+    function closeAuth() {
+        document.getElementById('authMask').style.display = 'none';
+    }
+
+    // 渲染导航右侧用户区（登录前：按钮；登录后：用户名 + 下拉菜单）
+    function renderAuth() {
+        const box = document.getElementById('authBox');
+        if (!box) return;
+        const cur = localStorage.getItem('poetry_user');
+        if (cur) {
+            box.innerHTML = `
+                <div class="auth-user" id="authUserBtn">
+                    <span>${cur}</span><span class="caret">▼</span>
+                    <div class="auth-menu">
+                        <a href="#" data-act="fav">我的收藏</a>
+                        <a href="#" data-act="profile">个人中心</a>
+                        <a href="#" data-act="logout">登出</a>
+                    </div>
+                </div>`;
+            const btn = document.getElementById('authUserBtn');
+            btn.onclick = e => { e.stopPropagation(); btn.classList.toggle('open'); };
+            box.querySelectorAll('.auth-menu a').forEach(a => {
+                a.onclick = e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    btn.classList.remove('open');
+                    const act = a.dataset.act;
+                    if (act === 'logout') {
+                        localStorage.removeItem('poetry_user');
+                        location.reload();   // 登出后回到登录门禁
+                    } else {
+                        alert(act === 'fav' ? '收藏功能待接入后端' : '个人中心待接入后端');
+                    }
+                };
+            });
+        } else {
+            box.innerHTML = '<button class="auth-btn" id="authLoginBtn">用户</button>';
+            document.getElementById('authLoginBtn').onclick = openAuth;
+        }
+    }
+    // 点击其它区域收起菜单
+    document.addEventListener('click', () => {
+        const b = document.getElementById('authUserBtn');
+        if (b) b.classList.remove('open');
+    });
+    window.renderAuth = renderAuth;   // 供门禁登录成功后刷新右上角
+    renderAuth();
+}
+document.addEventListener('DOMContentLoaded', initAuth);

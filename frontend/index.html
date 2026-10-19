@@ -151,6 +151,26 @@
     </style>
 </head>
 <body data-page="home">
+    <!-- 登录门禁（未登录先显示此层，登录成功才进入首页） -->
+    <div class="gate" id="gate">
+        <div class="gate-card">
+            <div class="gate-title-deco">❖ ❖ ❖</div>
+            <div class="gate-title" data-i18n="auth.gateTitle">千 年 诗 境</div>
+            <div class="gate-sub" data-i18n="auth.gateSub">请登录后进入首页</div>
+            <div class="auth-err" id="gateErr"></div>
+            <input class="auth-field" id="gateUser" placeholder="用户名" autocomplete="off" data-i18n-placeholder="auth.user">
+            <div class="pwd-wrap">
+                <input class="auth-field" id="gatePass" type="password" placeholder="密码" data-i18n-placeholder="auth.pass">
+                <button class="pwd-eye" id="gateEye" type="button" aria-label="显示密码">👁</button>
+            </div>
+            <div class="pwd-hint" id="gatePwdHint" data-i18n="auth.pwdHint" style="display:none">至少 8 位，需含两种字符（字母/数字/符号）</div>
+            <input class="auth-field" id="gatePass2" type="password" placeholder="确认密码" style="display:none" data-i18n-placeholder="auth.pass2">
+            <button class="auth-submit" id="gateSubmit" data-i18n="auth.submit">登 录</button>
+            <div class="auth-switch" id="gateSwitch" data-i18n="auth.toReg">没有账号？去注册</div>
+            <div class="auth-hint" data-i18n="auth.hint">模拟账号：admin / 123456</div>
+        </div>
+    </div>
+
     <nav class="nav">
         <a href="index.html" class="logo" data-i18n="logo">千年诗境</a>
         <a href="dynasty.html" data-page="dynasty" data-i18n="nav.dynasty">朝代分析</a>
@@ -250,6 +270,87 @@
                 bgLayer.style.opacity = 1;
             }, 600);
         }
+    </script>
+
+    <!-- 登录门禁逻辑 -->
+    <script>
+        (function () {
+            const gate = document.getElementById('gate');
+            // 打开前端总是先显示登录门禁
+            gate.style.display = 'flex';
+
+            const logged = localStorage.getItem('poetry_user');
+            const title = document.querySelector('#gate .gate-title');
+            const sub = document.querySelector('#gate .gate-sub');
+            const err = document.getElementById('gateErr');
+            const uIn = document.getElementById('gateUser');
+            const pIn = document.getElementById('gatePass');
+            const pass2 = document.getElementById('gatePass2');
+            const submit = document.getElementById('gateSubmit');
+            const sw = document.getElementById('gateSwitch');
+            const hint = document.querySelector('#gate .auth-hint');
+            const pwdHint = document.getElementById('gatePwdHint');
+            const eye = document.getElementById('gateEye');
+
+            if (logged) {
+                // 已登录：无需重新输密码，直接进入
+                function renderLoggedIn() {
+                    title.innerHTML = t('auth.gateTitle');
+                    sub.innerHTML = t('auth.welcomeBack') + '，' + logged;
+                    uIn.style.display = 'none';
+                    pIn.style.display = 'none';
+                    pass2.style.display = 'none';
+                    sw.style.display = 'none';
+                    hint.style.display = 'none';
+                    pwdHint.style.display = 'none';
+                    eye.style.display = 'none';
+                    err.textContent = '';
+                    submit.innerHTML = t('auth.enter');
+                }
+                renderLoggedIn();
+                submit.onclick = () => { gate.style.display = 'none'; };
+                window.addEventListener('langchange', renderLoggedIn);
+            } else {
+                // 未登录：登录 / 注册
+                let mode = 'login';
+                function setMode(m) {
+                    mode = m;
+                    title.innerHTML = t(m === 'login' ? 'auth.title' : 'auth.titleReg');
+                    submit.innerHTML = t(m === 'login' ? 'auth.submit' : 'auth.submitReg');
+                    sw.innerHTML = t(m === 'login' ? 'auth.toReg' : 'auth.toLogin');
+                    pass2.style.display = m === 'login' ? 'none' : 'block';
+                    pwdHint.style.display = m === 'login' ? 'none' : 'block';
+                    err.textContent = '';
+                }
+                // 密码防偷窥（仅切换明文/密文，图标不变）
+                eye.onclick = () => {
+                    pIn.type = pIn.type === 'password' ? 'text' : 'password';
+                };
+                sw.onclick = () => setMode(mode === 'login' ? 'register' : 'login');
+                submit.onclick = () => {
+                    const u = uIn.value.trim();
+                    const p = pIn.value;
+                    const p2 = pass2.value;
+                    err.textContent = '';
+                    if (!u || !p) { err.textContent = t('auth.errFill'); return; }
+                    const users = JSON.parse(localStorage.getItem('poetry_users') || '[]');
+                    if (mode === 'register') {
+                        if (pwdError(p)) { err.textContent = pwdError(p); return; }
+                        if (p !== p2) { err.textContent = t('auth.errMatch'); return; }
+                        if (users.some(x => x.u === u)) { err.textContent = t('auth.errExists'); return; }
+                        users.push({ u, p });
+                        localStorage.setItem('poetry_users', JSON.stringify(users));
+                    } else {
+                        const user = users.find(x => x.u === u && x.p === p);
+                        if (!user) { err.textContent = t('auth.errWrong'); return; }
+                    }
+                    localStorage.setItem('poetry_user', u);
+                    gate.style.display = 'none';   // 登录成功，进入首页
+                    if (window.renderAuth) window.renderAuth();
+                };
+                window.addEventListener('langchange', () => setMode(mode));
+            }
+        })();
     </script>
 </body>
 </html>
