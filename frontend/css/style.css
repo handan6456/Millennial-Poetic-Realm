@@ -3,6 +3,33 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* 中英文切换按钮（右下角圆形，紧挨换景按钮） */
+.lang-switch {
+    position: fixed;
+    bottom: 28px;
+    right: 96px;
+    z-index: 300;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: rgba(255, 253, 247, 0.85);
+    border: 2px solid var(--gold);
+    color: var(--ink-blue);
+    font-size: 12px;
+    font-family: "STKaiti", "KaiTi", serif;
+    letter-spacing: 1px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 12px rgba(25, 50, 95, 0.2);
+    transition: all 0.25s;
+}
+.lang-switch:hover {
+    background: var(--ink-blue);
+    color: #fff;
+}
+
 :root {
     --ink-blue: #19325F;      /* 佛头青 */
     --crimson: #77171C;       /* 朱樱 */

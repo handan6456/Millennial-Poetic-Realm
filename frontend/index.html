@@ -152,12 +152,12 @@
 </head>
 <body data-page="home">
     <nav class="nav">
-        <a href="index.html" class="logo">千年诗境</a>
-        <a href="dynasty.html" data-page="dynasty">朝代分析</a>
-        <a href="poet.html" data-page="poet">诗人图谱</a>
-        <a href="text.html" data-page="text">诗词文本分析</a>
-        <a href="imagery.html" data-page="imagery">诗境意象</a>
-        <a href="overview.html" data-page="overview">诗词数据概览</a>
+        <a href="index.html" class="logo" data-i18n="logo">千年诗境</a>
+        <a href="dynasty.html" data-page="dynasty" data-i18n="nav.dynasty">朝代分析</a>
+        <a href="poet.html" data-page="poet" data-i18n="nav.poet">诗人图谱</a>
+        <a href="text.html" data-page="text" data-i18n="nav.text">诗词文本分析</a>
+        <a href="imagery.html" data-page="imagery" data-i18n="nav.imagery">诗境意象</a>
+        <a href="overview.html" data-page="overview" data-i18n="nav.overview">诗词数据概览</a>
     </nav>
 
     <!-- 背景图层 -->
@@ -170,39 +170,39 @@
     </div>
 
     <!-- 换景按钮 -->
-    <button class="bg-switch" id="bgSwitch" onclick="switchBg()" title="更换背景">
+    <button class="bg-switch" id="bgSwitch" onclick="switchBg()" title="更换背景" data-i18n-title="bgTitle">
         <span class="icon">🏞</span>
-        <span>换景</span>
+        <span data-i18n="switchBg">换景</span>
     </button>
 
     <!-- 主内容 -->
     <div class="main-content">
         <div class="title-deco">❖ ❖ ❖</div>
         <div class="title-wrap">
-            <h1>千 年 诗 境</h1>
+            <h1 data-i18n="home.title">千 年 诗 境</h1>
         </div>
         <div class="title-deco">❖ ❖ ❖</div>
 
         <div class="feature-grid">
             <a href="dynasty.html" class="feature-item card-bg-1">
-                <h4>朝代分析</h4>
-                <p>各朝代作品数量、诗人数量、平均长度</p>
+                <h4 data-i18n="home.card1.title">朝代分析</h4>
+                <p data-i18n="home.card1.desc">各朝代作品数量、诗人数量、平均长度</p>
             </a>
             <a href="poet.html" class="feature-item card-bg-2">
-                <h4>诗人图谱</h4>
-                <p>作品数量 TopN、各朝代代表诗人</p>
+                <h4 data-i18n="home.card2.title">诗人图谱</h4>
+                <p data-i18n="home.card2.desc">作品数量 TopN、各朝代代表诗人</p>
             </a>
             <a href="text.html" class="feature-item card-bg-3">
-                <h4>诗词文本分析</h4>
-                <p>高频字词、长度分布、朝代高频字</p>
+                <h4 data-i18n="home.card3.title">诗词文本分析</h4>
+                <p data-i18n="home.card3.desc">高频字词、长度分布、朝代高频字</p>
             </a>
             <a href="imagery.html" class="feature-item card-bg-4">
-                <h4>诗境意象</h4>
-                <p>月、柳、酒等意象出现频率与分布</p>
+                <h4 data-i18n="home.card4.title">诗境意象</h4>
+                <p data-i18n="home.card4.desc">月、柳、酒等意象出现频率与分布</p>
             </a>
             <a href="overview.html" class="feature-item card-bg-5">
-                <h4>诗词数据概览</h4>
-                <p>类别统计、TopN、朝代×类别、长度区间</p>
+                <h4 data-i18n="home.card5.title">诗词数据概览</h4>
+                <p data-i18n="home.card5.desc">类别统计、TopN、朝代×类别、长度区间</p>
             </a>
         </div>
     </div>

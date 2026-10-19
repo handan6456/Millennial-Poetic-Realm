@@ -106,53 +106,53 @@
 </head>
 <body data-page="overview">
     <nav class="nav">
-        <a href="index.html" class="logo">千年诗境</a>
-        <a href="dynasty.html" data-page="dynasty">朝代分析</a>
-        <a href="poet.html" data-page="poet">诗人图谱</a>
-        <a href="text.html" data-page="text">诗词文本分析</a>
-        <a href="imagery.html" data-page="imagery">诗境意象</a>
-        <a href="overview.html" data-page="overview">诗词数据概览</a>
+        <a href="index.html" class="logo" data-i18n="logo">千年诗境</a>
+        <a href="dynasty.html" data-page="dynasty" data-i18n="nav.dynasty">朝代分析</a>
+        <a href="poet.html" data-page="poet" data-i18n="nav.poet">诗人图谱</a>
+        <a href="text.html" data-page="text" data-i18n="nav.text">诗词文本分析</a>
+        <a href="imagery.html" data-page="imagery" data-i18n="nav.imagery">诗境意象</a>
+        <a href="overview.html" data-page="overview" data-i18n="nav.overview">诗词数据概览</a>
     </nav>
 
     <div class="container">
         <div class="page-header">
-            <h1>诗词数据概览</h1>
-            <p>诗词类型与结构分析</p>
+            <h1 data-i18n="ov.title">诗词数据概览</h1>
+            <p data-i18n="ov.sub">诗词类型与结构分析</p>
         </div>
 
         <!-- 数字卡片 -->
         <div class="stats-row">
             <div class="stat-card">
                 <div class="num" id="statTotal">—</div>
-                <div class="label">诗词总数</div>
+                <div class="label" data-i18n="ov.statTotal">诗词总数</div>
             </div>
             <div class="stat-card">
                 <div class="num" id="statCategory">—</div>
-                <div class="label">诗词类别数</div>
+                <div class="label" data-i18n="ov.statCategory">诗词类别数</div>
             </div>
             <div class="stat-card">
                 <div class="num" id="statAvgLen">—</div>
-                <div class="label">平均字数</div>
+                <div class="label" data-i18n="ov.statAvgLen">平均字数</div>
             </div>
             <div class="stat-card">
                 <div class="num" id="statTopCat">—</div>
-                <div class="label">最常见类别</div>
+                <div class="label" data-i18n="ov.statTopCat">最常见类别</div>
             </div>
         </div>
 
         <div class="grid-2">
             <div class="card">
-                <h3>各诗词类别数量（点击扇区下钻）</h3>
+                <h3 data-i18n="ov.catPie">各诗词类别数量（点击扇区下钻）</h3>
                 <div id="categoryPie" class="chart"></div>
             </div>
             <div class="card">
-                <h3>诗词类别 TopN</h3>
+                <h3 data-i18n="ov.catTop">诗词类别 TopN</h3>
                 <div id="categoryTop" class="chart"></div>
             </div>
         </div>
 
         <div class="card" style="margin-top:20px;">
-            <h3>朝代 × 类别 分布（点击柱段，下方联动查看朝代详情）</h3>
+            <h3 data-i18n="ov.dynCat">朝代 × 类别 分布（点击柱段，下方联动查看朝代详情）</h3>
             <div id="dynastyCategory" class="chart" style="height:400px;"></div>
 
             <!-- 联动详情卡片 -->
@@ -166,28 +166,28 @@
                     </div>
                 </div>
                 <div class="detail-right">
-                    <h5>该朝代各类别数量</h5>
+                    <h5 data-i18n="ov.detailTitle">该朝代各类别数量</h5>
                     <div id="detailChart"></div>
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <h3>诗词长度区间分布（含平均线）</h3>
+            <h3 data-i18n="ov.lenRange">诗词长度区间分布（含平均线）</h3>
             <div id="lengthRange" class="chart"></div>
         </div>
     </div>
 
 <script src="js/common.js"></script>
 <script>
-// ============ 模拟数据 ============
+// ============ 模拟数据（内部用中文 key） ============
 const categoryCount = {
     "古体诗": 52341, "近体诗": 38920, "词": 8200,
     "绝句": 6500, "律诗": 4200, "乐府": 1800, "其他": 1500
 };
 const categoryTopN = Object.entries(categoryCount).sort((a, b) => b[1] - a[1]).slice(0, 6);
-const dynasties = ["唐代", "宋代", "元代", "明代", "清代", "魏晋", "先秦"];
-const categories = ["古体诗", "近体诗", "词", "绝句", "律诗"];
+const dynKeys = ["唐代", "宋代", "元代", "明代", "清代", "魏晋", "先秦"];
+const catKeys = ["古体诗", "近体诗", "词", "绝句", "律诗"];
 const dynastyCategoryData = {
     "古体诗": [18200, 9800, 2100, 7600, 8900, 3200, 541],
     "近体诗": [15600, 11200, 980, 4300, 5800, 800, 20],
@@ -198,63 +198,10 @@ const dynastyCategoryData = {
 const lengthRangeData = {
     "0-20": 12000, "21-50": 45000, "51-100": 32000, "101-200": 15000, "200+": 5643
 };
+const dt = k => t('dyn.' + k);   // 朝代显示名
+const ct = k => t('cat.' + k);   // 类别显示名
 
-// ============ 顶部数字卡片 ============
-const total = Object.values(categoryCount).reduce((a, b) => a + b, 0);
-const topCat = categoryTopN[0][0];
-const avgLen = Math.round(
-    (0*12000 + 35*45000 + 75*32000 + 150*15000 + 250*5643) / total
-);
-document.getElementById('statTotal').textContent = total.toLocaleString();
-document.getElementById('statCategory').textContent = Object.keys(categoryCount).length;
-document.getElementById('statAvgLen').textContent = avgLen + ' 字';
-document.getElementById('statTopCat').textContent = topCat;
-
-// ============ 1. 饼图（点击下钻） ============
-const pieChart = echarts.init(document.getElementById('categoryPie'));
-pieChart.setOption({
-    tooltip: { trigger: 'item', formatter: '{b}: {c} 首 ({d}%)' },
-    legend: { bottom: 0, type: 'scroll' },
-    color: THEME_COLORS,
-    series: [{
-        type: 'pie', radius: ['40%', '70%'],
-        label: { show: true, formatter: '{b}\n{d}%' },
-        data: Object.entries(categoryCount).map(([name, value]) => ({ name, value }))
-    }]
-});
-// 点击饼图扇区，alert该类别详情（下钻效果）
-pieChart.on('click', function(params) {
-    alert(`【${params.name}】\n数量：${params.value} 首\n占比：${params.percent}%`);
-});
-
-// ============ 2. TopN 横向条形图 ============
-echarts.init(document.getElementById('categoryTop')).setOption({
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-    grid: { left: 80, right: 40, top: 10, bottom: 30 },
-    xAxis: { type: 'value' },
-    yAxis: { type: 'category', data: categoryTopN.map(x => x[0]).reverse() },
-    series: [{
-        type: 'bar', data: categoryTopN.map(x => x[1]).reverse(),
-        itemStyle: { color: '#77171C', borderRadius: [0, 4, 4, 0] },
-        label: { show: true, position: 'right' }
-    }]
-});
-
-// ============ 3. 堆叠图（legend可筛选 + 点击联动） ============
-const dynastyChart = echarts.init(document.getElementById('dynastyCategory'));
-dynastyChart.setOption({
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-    legend: { data: categories, top: 0, selectedMode: 'multiple' },
-    grid: { left: 60, right: 30, top: 40, bottom: 30 },
-    xAxis: { type: 'category', data: dynasties },
-    yAxis: { type: 'value', name: '数量' },
-    color: THEME_COLORS,
-    series: categories.map(cat => ({
-        name: cat, type: 'bar', stack: 'total', data: dynastyCategoryData[cat]
-    }))
-});
-
-// 各朝代代表诗句（模拟，接后端后可换成接口数据）
+// 各朝代代表诗句（模拟，接后端后可换成接口数据；诗词本身不翻译）
 const dynastyPoem = {
     "唐代": { verse: "海上生明月，天涯共此时。", src: "张九龄《望月怀远》" },
     "宋代": { verse: "山重水复疑无路，柳暗花明又一村。", src: "陆游《游山西村》" },
@@ -265,21 +212,30 @@ const dynastyPoem = {
     "先秦": { verse: "关关雎鸠，在河之洲。", src: "《诗经·关雎》" }
 };
 
-// 详情小条形图
+// 图表实例（只初始化一次）
+const pieChart = echarts.init(document.getElementById('categoryPie'));
+const catTopChart = echarts.init(document.getElementById('categoryTop'));
+const dynastyChart = echarts.init(document.getElementById('dynastyCategory'));
 const detailChart = echarts.init(document.getElementById('detailChart'));
-function updateDetail(dynastyIdx) {
-    const name = dynasties[dynastyIdx];
-    const values = categories.map(cat => dynastyCategoryData[cat][dynastyIdx]);
+const lenChart = echarts.init(document.getElementById('lengthRange'));
+
+let curIdx = 0;
+function updateDetail(i) {
+    curIdx = i;
+    const key = dynKeys[i];
+    const name = dt(key);
+    const values = catKeys.map(cat => dynastyCategoryData[cat][i]);
     const total = values.reduce((a, b) => a + b, 0);
     document.getElementById('detailDynasty').textContent = name;
-    document.getElementById('detailTotal').textContent = `共计 ${total.toLocaleString()} 首诗词`;
-    const p = dynastyPoem[name] || {};
-    document.getElementById('detailVerse').textContent = p.verse || '（暂无诗句）';
+    document.getElementById('detailTotal').textContent =
+        `${t('ov.totalPrefix')} ${total.toLocaleString()} ${t('ov.totalSuffix')}`;
+    const p = dynastyPoem[key] || {};
+    document.getElementById('detailVerse').textContent = p.verse || t('ov.noVerse');
     document.getElementById('detailVerseSrc').textContent = p.src ? '—— ' + p.src : '';
     detailChart.setOption({
         tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
         grid: { left: 40, right: 20, top: 10, bottom: 42 },
-        xAxis: { type: 'category', data: categories, axisLabel: { interval: 0, fontSize: 12 } },
+        xAxis: { type: 'category', data: catKeys.map(ct), axisLabel: { interval: 0, fontSize: 12 } },
         yAxis: { type: 'value', show: false },
         color: THEME_COLORS,
         series: [{
@@ -290,34 +246,93 @@ function updateDetail(dynastyIdx) {
         }]
     }, true);
 }
-// 初始显示第一个朝代（唐代）
-updateDetail(0);
+
+function renderOverview() {
+    // 顶部数字卡片
+    const total = Object.values(categoryCount).reduce((a, b) => a + b, 0);
+    const topCat = categoryTopN[0][0];
+    const avgLen = Math.round(
+        (0*12000 + 35*45000 + 75*32000 + 150*15000 + 250*5643) / total
+    );
+    document.getElementById('statTotal').textContent = total.toLocaleString();
+    document.getElementById('statCategory').textContent = Object.keys(categoryCount).length;
+    document.getElementById('statAvgLen').textContent = avgLen + ' ' + t('ov.lenUnit');
+    document.getElementById('statTopCat').textContent = ct(topCat);
+
+    // 1. 饼图（点击下钻）
+    pieChart.setOption({
+        tooltip: {
+            trigger: 'item',
+            formatter: p => `${p.name}: ${p.value} ${t('ov.totalSuffix')} (${p.percent}%)`
+        },
+        legend: { bottom: 0, type: 'scroll' },
+        color: THEME_COLORS,
+        series: [{
+            type: 'pie', radius: ['40%', '70%'],
+            label: { show: true, formatter: '{b}\n{d}%' },
+            data: Object.entries(categoryCount).map(([name, value]) => ({ name: ct(name), value }))
+        }]
+    }, true);
+
+    // 2. TopN 横向条形图
+    catTopChart.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        grid: { left: 100, right: 40, top: 10, bottom: 30 },
+        xAxis: { type: 'value' },
+        yAxis: { type: 'category', data: categoryTopN.map(x => ct(x[0])).reverse() },
+        series: [{
+            type: 'bar', data: categoryTopN.map(x => x[1]).reverse(),
+            itemStyle: { color: '#77171C', borderRadius: [0, 4, 4, 0] },
+            label: { show: true, position: 'right' }
+        }]
+    }, true);
+
+    // 3. 堆叠图（legend可筛选 + 点击联动）
+    dynastyChart.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        legend: { data: catKeys.map(ct), top: 0, selectedMode: 'multiple' },
+        grid: { left: 60, right: 30, top: 40, bottom: 30 },
+        xAxis: { type: 'category', data: dynKeys.map(dt) },
+        yAxis: { type: 'value', name: t('ov.quantity') },
+        color: THEME_COLORS,
+        series: catKeys.map(cat => ({
+            name: ct(cat), type: 'bar', stack: 'total', data: dynastyCategoryData[cat]
+        }))
+    }, true);
+
+    // 4. 长度区间（加平均线）
+    lenChart.setOption({
+        tooltip: { trigger: 'axis' },
+        grid: { left: 60, right: 60, top: 30, bottom: 30 },
+        xAxis: { type: 'category', data: Object.keys(lengthRangeData), name: t('ov.rangeName') },
+        yAxis: { type: 'value', name: t('ov.poemCount') },
+        color: THEME_COLORS,
+        series: [{
+            type: 'bar', data: Object.values(lengthRangeData),
+            itemStyle: { color: '#19325F', borderRadius: [4, 4, 0, 0] },
+            label: { show: true, position: 'top' },
+            markLine: {
+                data: [{ type: 'average', name: t('ov.average') }],
+                lineStyle: { color: '#77171C', type: 'dashed' },
+                label: { formatter: t('ov.avgFmt') }
+            }
+        }]
+    }, true);
+
+    updateDetail(curIdx);
+}
+
+// 点击饼图扇区，alert该类别详情（下钻效果）
+pieChart.on('click', function(params) {
+    alert(`【${params.name}】\n${t('ov.quantity')}: ${params.value} ${t('ov.totalSuffix')}\n${t('ov.share')}: ${params.percent}%`);
+});
 // 点击堆叠图任意一段 -> 联动更新详情
 dynastyChart.on('click', function(params) {
     updateDetail(params.dataIndex);
 });
 
-// ============ 4. 长度区间（加平均线） ============
-const ranges = Object.keys(lengthRangeData);
-const counts = Object.values(lengthRangeData);
-echarts.init(document.getElementById('lengthRange')).setOption({
-    tooltip: { trigger: 'axis' },
-    grid: { left: 60, right: 60, top: 30, bottom: 30 },
-    xAxis: { type: 'category', data: ranges, name: '字数区间' },
-    yAxis: { type: 'value', name: '诗词数量' },
-    color: THEME_COLORS,
-    series: [{
-        type: 'bar', data: counts,
-        itemStyle: { color: '#19325F', borderRadius: [4, 4, 0, 0] },
-        label: { show: true, position: 'top' },
-        markLine: {
-            data: [{ type: 'average', name: '平均' }],
-            lineStyle: { color: '#77171C', type: 'dashed' },
-            label: { formatter: '平均: {c}' }
-        }
-    }]
-});
-
+document.addEventListener('DOMContentLoaded', renderOverview);
+window.addEventListener('langchange', renderOverview);
 window.addEventListener('resize', () => {
     document.querySelectorAll('.chart').forEach(el => echarts.getInstanceByDom(el)?.resize());
 });
